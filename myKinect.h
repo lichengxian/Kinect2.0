@@ -4,6 +4,9 @@
 #include <ctime>
 #include <conio.h>
 
+using namespace std;
+using namespace cv;
+
 // Safe release for interfaces
 template<class Interface>
 inline void SafeRelease(Interface *& pInterfaceToRelease)
@@ -15,15 +18,34 @@ inline void SafeRelease(Interface *& pInterfaceToRelease)
 	}
 }
 
-// 返回想要的结果
-struct DATA {
-	cv::Mat img;
-	bool flag = false;
+// 原生骨架信息
+struct Skeleton {
 	float X[25];
 	float Y[25];
 	float Z[25];
 };
 
+// 深度图的骨架信息
+struct Depth{
+	cv::Mat dimg;
+	float depthX[25];
+	float depthY[25];
+};
+
+// 彩图中中的骨架信息
+struct Color {
+	cv::Mat cimg;
+	float colorX[25];
+	float colorY[25];
+};
+
+// 返回想要的结果
+struct DATA {
+	bool flag = false;
+	Skeleton skeleton;
+	Depth depth;
+	Color color;
+};
 
 class CBodyBasics
 {
@@ -42,10 +64,6 @@ public:
 	DATA data;
 	// 帧数
 	int frame_num = 0;
-	// 是否显示骨架
-	bool show_skeleton = false;
-	// 表示骨架已经成功获取
-	bool s_flag = true;
 
 private:
 	IKinectSensor*          m_pKinectSensor;//kinect源
@@ -56,7 +74,7 @@ private:
 	IColorFrameReader*      m_pColorFrameReader;//用于视频流
 
 	//通过获得到的信息，把骨架和背景二值图画出来
-	void                    ProcessBody(int nBodyCount, IBody** ppBodies);
+	void ProcessBody(int nBodyCount, IBody** ppBodies);
 	//画骨架函数
 	void DrawBone(const Joint* pJoints, const ColorSpacePoint* depthSpacePosition, JointType joint0, JointType joint1);
 	//画手的状态函数
@@ -67,4 +85,3 @@ private:
 	cv::Mat depthImg;
 	cv::Mat colorImg;
 };
-
